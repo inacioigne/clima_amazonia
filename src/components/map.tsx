@@ -52,6 +52,7 @@ export default async function Map() {
   const limits = await getData()
   const prec = await getPrec()
   const countries = await getCountries()
+  console.log(countries)
   const bacias = await getBacias()
 
   return (
