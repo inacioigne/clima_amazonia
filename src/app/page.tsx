@@ -1,9 +1,14 @@
 import MapAnomalia from "@/components/mapAnomalia";
+import Map from "@/components/map"
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
     <main>
-      <MapAnomalia />
+      <Suspense fallback={<h1>Carregando...</h1>}>
+        <Map />
+      </Suspense>
+
     </main>
   );
 }
