@@ -23,14 +23,14 @@ interface Prpos {
 
 export default function RainAnomaly({ limits, countries, bacias }: Prpos) {
     const [suspense, setSuspense] = useState(false)
-    const [prec, setPrec] = useState<FeatureCollection<Geometry, PropertiesPrec> | null>(null)
+    // const [prec, setPrec] = useState<FeatureCollection<Geometry, PropertiesPrec> | null>(null)
     const canvasRef = useRef(null);
 
-    async function fetchData() {
-        const res = await fetch('data/prec.geojson');
-        const result = await res.json();
-        setPrec(result);
-    }
+    // async function fetchData() {
+    //     const res = await fetch('data/prec.geojson');
+    //     const result = await res.json();
+    //     setPrec(result);
+    // }
 
     useEffect(() => {
         const canvas = d3.select(canvasRef.current)
@@ -40,7 +40,7 @@ export default function RainAnomaly({ limits, countries, bacias }: Prpos) {
         if (node !== null) {
             const context = node.getContext('2d');
             if (context !== null) {
-                setSuspense(true)
+                
                 const path = d3.geoPath()
                     .projection(projection)
                     .context(context)
@@ -82,16 +82,13 @@ export default function RainAnomaly({ limits, countries, bacias }: Prpos) {
                             context.textAlign = "center";
                             context.fillText(feature.properties.label, centroid[0], centroid[1])
                         });
+                        setSuspense(true)
                     } catch (error) {
                         console.error('Error fetching GeoJSON data:', error);
                     }
                 };
 
                 fetchGeoData()
-
-
-
-
             }
         }
     }, [])
@@ -99,7 +96,7 @@ export default function RainAnomaly({ limits, countries, bacias }: Prpos) {
     return (
         <>
             {!suspense && <div role="status" className="max-w-sm animate-pulse">
-                <div className="h-96 bg-gray-200 dark:bg-gray-400 mb-4" style={{ width: width }}></div>
+                <div className="bg-gray-200 dark:bg-gray-400 mb-4" style={{ width: width, height: height }}></div>
             </div>}
             <div style={suspense ? { display: 'block', width: width, height: height } : { display: 'none' }}>
                 <canvas
