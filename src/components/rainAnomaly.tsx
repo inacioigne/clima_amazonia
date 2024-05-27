@@ -14,14 +14,24 @@ interface PropertiesBacias {
 }
 interface Prpos {
     limits: FeatureCollection<Geometry>;
-    prec: FeatureCollection<Geometry, PropertiesPrec>
+    // prec: FeatureCollection<Geometry, PropertiesPrec>
     countries: FeatureCollection<Geometry>;
     bacias: FeatureCollection<Geometry, PropertiesBacias>;
 
 }
-export default function RainAnomaly({ limits, prec, countries, bacias }: Prpos) {
+
+
+export default function RainAnomaly({ limits, countries, bacias }: Prpos) {
     const [suspense, setSuspense] = useState(false)
+    const [prec, setPrec] = useState<FeatureCollection<Geometry, PropertiesPrec> | null>(null)
     const canvasRef = useRef(null);
+
+    async function fetchData() {
+        const res = await fetch('data/prec.geojson');
+        const result = await res.json();
+        setPrec(result);
+    }
+
     useEffect(() => {
         const canvas = d3.select(canvasRef.current)
         const node = canvas.node() as HTMLCanvasElement | null;
@@ -38,33 +48,50 @@ export default function RainAnomaly({ limits, prec, countries, bacias }: Prpos) 
                 context.clearRect(0, 0, width, height);
                 context.fillStyle = `rgba(17, 90, 246, 0.1)`;
                 // Precipitação
-                prec.features.forEach(feature => {
-                    context.beginPath(),
-                        path(feature),
-                        (context.fillStyle = feature.properties.color),
-                        context.fill();
-                });
-                // countries
-                countries.features.forEach(feature => {
-                    context.beginPath();
-                    path(feature);
-                    context.strokeStyle = 'black';
-                    context.lineWidth = 1;
-                    context.stroke();
-                });
-                // bacias
-                bacias.features.forEach(feature => {
-                    const centroid = path.centroid(feature);
-                    context.beginPath();
-                    path(feature);
-                    context.strokeStyle = 'black';
-                    context.lineWidth = 2;
-                    context.stroke();
-                    context.font = "bold 14px Arial";
-                    context.fillStyle = "black";
-                    context.textAlign = "center";
-                    context.fillText(feature.properties.label, centroid[0], centroid[1])
-                });
+                const fetchGeoData = async () => {
+                    try {
+                        const response = await fetch('data/prec.geojson');
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
+                        data.features.forEach(feature => {
+                            context.beginPath(),
+                                path(feature),
+                                (context.fillStyle = feature.properties.color),
+                                context.fill();
+                        });
+                        // countries
+                        countries.features.forEach(feature => {
+                            context.beginPath();
+                            path(feature);
+                            context.strokeStyle = 'black';
+                            context.lineWidth = 1;
+                            context.stroke();
+                        });
+                        // bacias
+                        bacias.features.forEach(feature => {
+                            const centroid = path.centroid(feature);
+                            context.beginPath();
+                            path(feature);
+                            context.strokeStyle = 'black';
+                            context.lineWidth = 2;
+                            context.stroke();
+                            context.font = "bold 14px Arial";
+                            context.fillStyle = "black";
+                            context.textAlign = "center";
+                            context.fillText(feature.properties.label, centroid[0], centroid[1])
+                        });
+                    } catch (error) {
+                        console.error('Error fetching GeoJSON data:', error);
+                    }
+                };
+
+                fetchGeoData()
+
+
+
+
             }
         }
     }, [])

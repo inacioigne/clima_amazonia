@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import RainAnomaly from './rainAnomaly';
-import { Suspense } from 'react';
+// import { Suspense } from 'react';
 
 export async function fetchRevenue() {
   await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -16,15 +16,17 @@ async function getData() {
   }
   return data
 }
-async function getPrec() {
-  const filePath = path.join(process.cwd(), 'public', 'data/prec.geojson');
-  const jsonData = fs.readFileSync(filePath, 'utf8');
-  const prec = JSON.parse(jsonData);
-  if (!prec) {
-    throw new Error('Failed to fetch data')
-  }
-  return prec
-}
+
+// async function getPrec() {
+//   const filePath = path.join(process.cwd(), 'public', 'data/prec.geojson');
+//   const jsonData = fs.readFileSync(filePath, 'utf8');
+//   const prec = JSON.parse(jsonData);
+//   if (!prec) {
+//     throw new Error('Failed to fetch data')
+//   }
+//   return prec
+// }
+
 async function getCountries() {
   const filePath = path.join(process.cwd(), 'public', 'data/countries.geojson');
   const jsonData = fs.readFileSync(filePath, 'utf8');
@@ -50,9 +52,9 @@ async function getBacias() {
 export default async function Map() {
   // const revenue = await fetchRevenue()
   const limits = await getData()
-  const prec = await getPrec()
+  // const prec = await getPrec()
   const countries = await getCountries()
-  console.log(countries)
+  // console.log(countries)
   const bacias = await getBacias()
 
   return (
@@ -62,7 +64,10 @@ export default async function Map() {
         <p className="font-serif">Período: 26/03/2024 - 24/04/2024</p>
       </div>
 
-      <RainAnomaly limits={limits} prec={prec} countries={countries} bacias={bacias} />
+      <RainAnomaly
+        limits={limits}
+        // prec={prec} 
+        countries={countries} bacias={bacias} />
     </div>
   )
 }
