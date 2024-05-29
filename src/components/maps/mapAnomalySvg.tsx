@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { FeatureCollection, Feature, Geometry, GeometryCollection } from 'geojson';
+import { FeatureCollection, Feature, Geometry, GeometryCollection, Point, Position } from 'geojson';
 
 interface PropertiesBacias {
     label: string;
@@ -19,66 +19,112 @@ interface Props {
 export default function MapAnomalySvg({ bacias, countries, }: Props) {
     const [loading, setLoading] = useState(false)
 
-    const svgRef = useRef();
+    const svgRef = useRef<SVGSVGElement | null>(null);
     const width = 800;
     const height = 600;
 
-    useEffect(() => {
-        const svg = d3.select(svgRef.current).attr('viewBox', [0, 0, width, height])
-            .attr('preserveAspectRatio', 'xMidYMid meet');
-        const projection = d3.geoMercator().fitExtent([[40, 10], [width, height - 20]], bacias)
-        const pathGenerator = d3.geoPath(projection)
-        svg.selectAll('*').remove();
-
-        const loadData = async () => {
-            setLoading(true)
-            try {
-                const response = await fetch('data/preciptation.geojson');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
-
-                svg.selectAll("circle")
-                    .data(data.features)
-                    .enter().append("circle")
-                    .attr("cx", d => projection(d.geometry.coordinates)[0])
-                    .attr("cy", d => projection(d.geometry.coordinates)[1])
-                    .attr("r", 2)
-                    .style("fill", d => d.properties.color)
-
-                svg.selectAll("path.country")
-                    .data(countries.features).enter().append("path")
-                    .attr("d", pathGenerator)
-                    .attr('fill', 'none')
-                    .attr('stroke', 'black')
-
-                svg.selectAll("path.bacia")
-                    .data(bacias.features).enter().append("path")
-                    .attr("d", pathGenerator)
-                    .attr('fill', 'none')
-                    .attr('stroke', 'black')
-                    .style("stroke-width", 2)
-
-                svg.selectAll("text")
-                    .data(bacias.features)
-                    .enter().append("text")
-                    .attr("x", d => projection(d3.geoCentroid(d))[0])
-                    .attr("y", d => projection(d3.geoCentroid(d))[1])
-                    .attr("dy", ".35em")
-                    .attr("font-size", "10px")
-                    .attr("text-anchor", "middle")
-                    .text(d => d.properties.label);
-
-
-            } catch (error) {
-                console.error('Error fetching GeoJSON data:', error);
+    function safeProjection(geometry: Feature<Geometry>, projection: d3.GeoProjection): [number, number] {
+        const centroid = d3.geoCentroid(geometry);
+        if (centroid) {
+            const projected = projection(centroid as [number, number]);
+            if (projected) {
+                return projected;
             }
-            setLoading(false)
+        }
+        console.error('Projection or centroid is null');
+        return [0, 0]; // Valor padrão em caso de erro
+    }
 
-        };
+    useEffect(() => {
+        if (svgRef.current) {
+            const svg = d3.select(svgRef.current).attr('viewBox', [0, 0, width, height])
+                .attr('preserveAspectRatio', 'xMidYMid meet');
+            const projection = d3.geoMercator().fitExtent([[40, 10], [width, height - 20]], bacias)
+            const pathGenerator = d3.geoPath(projection)
+            svg.selectAll('*').remove();
+            const loadData = async () => {
+                setLoading(true)
+                try {
+                    const response = await fetch('data/preciptation.geojson');
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
 
-        loadData();
+                    svg.selectAll("circle")
+                        .data(data.features)
+                        .enter().append("circle")
+                        .attr("cx", d => {
+                            const coordinates = (d.geometry as Point).coordinates;
+                            const projected = projection(coordinates as [number, number]);
+                            return projected ? projected[0] : 0;
+                        })
+                        .attr("cy", d => {
+                            const coordinates = (d.geometry as Point).coordinates;
+                            const projected = projection(coordinates as [number, number]);
+                            return projected ? projected[1] : 0;
+                        })
+                        .attr("r", 2)
+                        .style("fill", d => d.properties.color)
+
+                    svg.selectAll("path.country")
+                        .data(countries.features).enter().append("path")
+                        .attr("d", pathGenerator)
+                        .attr('fill', 'none')
+                        .attr('stroke', 'black')
+
+                    svg.selectAll("path.bacia")
+                        .data(bacias.features).enter().append("path")
+                        .attr("d", pathGenerator)
+                        .attr('fill', 'none')
+                        .attr('stroke', 'black')
+                        .style("stroke-width", 2)
+
+                    bacias.features.forEach(feature => {
+                        const [x, y] = safeProjection(feature, projection);
+                        const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
+                        const text = group.append('text')
+                            .text(feature.properties.label || '')
+                            .attr("font-size", "10px")
+                            .attr('text-anchor', 'middle') // Centraliza o texto
+                            .attr('dy', '.35em'); // Ajusta a posição vertical
+                        // Verifique se o nó de texto existe antes de obter seu tamanho
+                        const textNode = text.node();
+                        if (textNode) {
+                            const bbox = textNode.getBBox();
+
+                            // Adicione um retângulo de fundo
+                            group.insert('rect', 'text')
+                                .attr('x', bbox.x - 2) // Pequena margem
+                                .attr('y', bbox.y - 2)
+                                .attr('width', bbox.width + 4) // Ajuste para a margem
+                                .attr('height', bbox.height + 4)
+                                .attr('fill', 'lightgrey'); // Cor de fundo
+
+                            // Reposicione o texto para estar acima do retângulo de fundo
+                            text.raise();
+                        } else {
+                            console.error('Text node is null');
+                        }
+                    })
+                
+
+
+                } catch (error) {
+                    console.error('Error fetching GeoJSON data:', error);
+                }
+                setLoading(false)
+
+            };
+            loadData();
+
+        }
+
+
+
+
+
+
     }, [])
 
     return (
