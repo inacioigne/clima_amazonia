@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function MapAnomalySvg({ bacias, countries, preciptation }: Props) {
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const width = 800;
@@ -37,6 +37,7 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
     }
 
     useEffect(() => {
+        // setLoading(true)
         if (svgRef.current) {
             const svg = d3.select(svgRef.current).attr('viewBox', [0, 0, width, height])
                 .attr('preserveAspectRatio', 'xMidYMid meet');
@@ -95,6 +96,7 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
                     text.raise();
                 }
             })
+            setLoading(false)
 
             // const loadData = async () => {
             //     setLoading(true)
@@ -188,6 +190,7 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
             // };
             // loadData();
         }
+        
     }, [bacias, countries, preciptation])
 
     return (
@@ -200,7 +203,9 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
             {loading && <div role="status" className="animate-pulse p-4" >
                 <div className="bg-gray-200 dark:bg-gray-400 " style={{ width: '100%', height: height }}></div>
             </div>}
-            <svg ref={svgRef} style={loading ? { display: "none" } : { width: '100%', height: 'auto' }} />
+            <svg ref={svgRef} 
+            // style={loading ? { display: "none", width: '100%', height: 'auto' } : { width: '100%', height: 'auto' }} 
+            />
 
             <div className="border-black flex flex-wrap justify-center pt-2" >
                 <div>
