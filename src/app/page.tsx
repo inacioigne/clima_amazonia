@@ -24,14 +24,25 @@ async function getBacias() {
   return bacias
 }
 
+async function getPreciptation() {
+  const filePath = path.join(process.cwd(), 'public', 'data/preciptation.geojson');
+  const jsonData = fs.readFileSync(filePath, 'utf8');
+  const preciptation = JSON.parse(jsonData);
+  if (!preciptation) {
+    throw new Error('Failed to fetch data')
+  }
+  return preciptation
+}
+
 export default async function Home() {
   const countries = await getCountries()
   const bacias = await getBacias()
+  const preciptation = await getPreciptation()
 
   return (
     <div className="border-4 border-red-500 h-full w-full container mx-auto py-4 grid gap-3 grid-cols-5">
       <div className='col-span-5 2xl:col-span-3' >
-        <MapAnomalySvg bacias={bacias} countries={countries} />
+        <MapAnomalySvg bacias={bacias} countries={countries} preciptation={preciptation} />
 
       </div>
       <div className="col-span-5 2xl:col-span-2 grid gap-3">

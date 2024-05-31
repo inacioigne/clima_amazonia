@@ -14,9 +14,10 @@ interface PropertiesPrec {
 interface Props {
     bacias: FeatureCollection<Geometry, PropertiesBacias>;
     countries: FeatureCollection<Geometry>;
+    preciptation: FeatureCollection<Geometry, PropertiesPrec>;
 }
 
-export default function MapAnomalySvg({ bacias, countries, }: Props) {
+export default function MapAnomalySvg({ bacias, countries, preciptation }: Props) {
     const [loading, setLoading] = useState(false)
 
     const svgRef = useRef<SVGSVGElement | null>(null);
@@ -42,90 +43,152 @@ export default function MapAnomalySvg({ bacias, countries, }: Props) {
             const projection = d3.geoMercator().fitExtent([[40, 10], [width, height - 20]], bacias)
             const pathGenerator = d3.geoPath(projection)
             svg.selectAll('*').remove();
-            const loadData = async () => {
-                setLoading(true)
-                try {
-                    const response = await fetch('data/preciptation.geojson');
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
+            // preciptation
+            svg.selectAll("circle")
+                .data(preciptation.features)
+                .enter().append("circle")
+                .attr("cx", d => {
+                    const coordinates = (d.geometry as Point).coordinates;
+                    const projected = projection(coordinates as [number, number]);
+                    return projected ? projected[0] : 0;
+                })
+                .attr("cy", d => {
+                    const coordinates = (d.geometry as Point).coordinates;
+                    const projected = projection(coordinates as [number, number]);
+                    return projected ? projected[1] : 0;
+                })
+                .attr("r", 2)
+                .style("fill", d => d.properties.color)
+            // countries
+            svg.selectAll("path.countries")
+                .data(countries.features).enter().append("path")
+                .attr("d", pathGenerator)
+                .attr('fill', 'none')
+                .attr('stroke', 'black')
+            // Bacias
+            svg.selectAll("path.bacia")
+                .data(bacias.features).enter().append("path")
+                .attr("d", pathGenerator)
+                .attr('fill', 'none')
+                .attr('stroke', 'black')
+                .style("stroke-width", 2)
+            bacias.features.forEach(feature => {
+                const [x, y] = safeProjection(feature, projection);
+                const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
+                const text = group.append('text')
+                    .text(feature.properties.label)
+                    .attr("font-size", "10px")
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '.35em');
+                const bbox = text.node()?.getBBox();
+                if (bbox !== undefined) {
+                    if (bbox.x !== 0) {
+                        group.insert('rect', 'text')
+                            .attr('x', bbox.x - 2) // Pequena margem
+                            .attr('y', bbox.y - 2)
+                            .attr('rx', 5)
+                            .attr('ry', 5)
+                            .attr('width', bbox.width + 4) // Ajuste para a margem
+                            .attr('height', bbox.height + 4)
+                            .attr('fill', 'lightgrey');
                     }
-                    const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
-
-                    svg.selectAll("circle")
-                        .data(data.features)
-                        .enter().append("circle")
-                        .attr("cx", d => {
-                            const coordinates = (d.geometry as Point).coordinates;
-                            const projected = projection(coordinates as [number, number]);
-                            return projected ? projected[0] : 0;
-                        })
-                        .attr("cy", d => {
-                            const coordinates = (d.geometry as Point).coordinates;
-                            const projected = projection(coordinates as [number, number]);
-                            return projected ? projected[1] : 0;
-                        })
-                        .attr("r", 2)
-                        .style("fill", d => d.properties.color)
-
-                    svg.selectAll("path.country")
-                        .data(countries.features).enter().append("path")
-                        .attr("d", pathGenerator)
-                        .attr('fill', 'none')
-                        .attr('stroke', 'black')
-
-                    svg.selectAll("path.bacia")
-                        .data(bacias.features).enter().append("path")
-                        .attr("d", pathGenerator)
-                        .attr('fill', 'none')
-                        .attr('stroke', 'black')
-                        .style("stroke-width", 2)
-
-                    bacias.features.forEach(feature => {
-                        const [x, y] = safeProjection(feature, projection);
-                        const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
-                        const text = group.append('text')
-                            .text(feature.properties.label || '')
-                            .attr("font-size", "10px")
-                            .attr('text-anchor', 'middle') // Centraliza o texto
-                            .attr('dy', '.35em'); // Ajusta a posição vertical
-                        // Verifique se o nó de texto existe antes de obter seu tamanho
-                        const textNode = text.node();
-                        if (textNode) {
-                            const bbox = textNode.getBBox();
-
-                            // Adicione um retângulo de fundo
-                            group.insert('rect', 'text')
-                                .attr('x', bbox.x - 2) // Pequena margem
-                                .attr('y', bbox.y - 2)
-                                .attr('width', bbox.width + 4) // Ajuste para a margem
-                                .attr('height', bbox.height + 4)
-                                .attr('fill', 'lightgrey'); // Cor de fundo
-
-                            // Reposicione o texto para estar acima do retângulo de fundo
-                            text.raise();
-                        } else {
-                            console.error('Text node is null');
-                        }
-                    })
-                
-
-
-                } catch (error) {
-                    console.error('Error fetching GeoJSON data:', error);
+                    text.raise();
                 }
-                setLoading(false)
+            })
 
-            };
-            loadData();
+            // const loadData = async () => {
+            //     setLoading(true)
+            //     try {
+            //         const response = await fetch('data/preciptation.geojson');
+            //         if (!response.ok) {
+            //             throw new Error('Network response was not ok');
+            //         }
+            //         const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
 
+            //         svg.selectAll("circle")
+            //             .data(data.features)
+            //             .enter().append("circle")
+            //             .attr("cx", d => {
+            //                 const coordinates = (d.geometry as Point).coordinates;
+            //                 const projected = projection(coordinates as [number, number]);
+            //                 return projected ? projected[0] : 0;
+            //             })
+            //             .attr("cy", d => {
+            //                 const coordinates = (d.geometry as Point).coordinates;
+            //                 const projected = projection(coordinates as [number, number]);
+            //                 return projected ? projected[1] : 0;
+            //             })
+            //             .attr("r", 2)
+            //             .style("fill", d => d.properties.color)
+
+            //         svg.selectAll("path.country")
+            //             .data(countries.features).enter().append("path")
+            //             .attr("d", pathGenerator)
+            //             .attr('fill', 'none')
+            //             .attr('stroke', 'black')
+
+            //         svg.selectAll("path.bacia")
+            //             .data(bacias.features).enter().append("path")
+            //             .attr("d", pathGenerator)
+            //             .attr('fill', 'none')
+            //             .attr('stroke', 'black')
+            //             .style("stroke-width", 2)
+
+            //         // const labels = svg.selectAll(".label-group")
+            //         //     .data(bacias.features)
+            //         //     .enter()
+            //         //     .append("g")
+            //         //     .attr("class", "label-group")
+            //         //     .attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
+            //         // // Adicionar os rótulos
+            //         // labels.append("text")
+            //         //     .attr("dy", ".35em")
+            //         //     .text(d => d.properties.label)
+            //         //     .each(function (d) {
+            //         //         const bbox = (this as SVGTextElement).getBBox();
+            //         //         d.bbox = bbox;
+            //         //     });
+            //         // labels.insert("rect", "text")
+            //         //     .attr("x", d => d.bbox.x - 2)
+            //         //     .attr("y", d => d.bbox.y - 2)
+            //         //     .attr("width", d => d.bbox.width + 4)
+            //         //     .attr("height", d => d.bbox.height + 4)
+            //         //     .attr('fill', 'lightgrey')
+
+
+
+            //         bacias.features.forEach(feature => {
+            //             const [x, y] = safeProjection(feature, projection);
+            //             const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
+            //             const text = group.append('text')
+            //                 .text(feature.properties.label)
+            //                 .attr("font-size", "10px")
+            //                 .attr('text-anchor', 'middle')
+            //                 .attr('dy', '.35em');
+            //             const bbox = text.node()?.getBBox();
+            //             if (bbox !== undefined) {
+            //                 if (bbox.x !== 0) {
+            //                     group.insert('rect', 'text')
+            //                         .attr('x', bbox.x - 2) // Pequena margem
+            //                         .attr('y', bbox.y - 2)
+            //                         .attr('rx', 5)
+            //                         .attr('ry', 5)
+            //                         .attr('width', bbox.width + 4) // Ajuste para a margem
+            //                         .attr('height', bbox.height + 4)
+            //                         .attr('fill', 'lightgrey');
+            //                 }
+            //                 text.raise();
+            //             }
+            //         })
+            //     } catch (error) {
+            //         console.error('Error fetching GeoJSON data:', error);
+            //     }
+            //     setLoading(false)
+
+            // };
+            // loadData();
         }
-
-
-
-
-
-
-    }, [])
+    }, [bacias, countries, preciptation])
 
     return (
         <div >
