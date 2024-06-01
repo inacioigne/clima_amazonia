@@ -109,7 +109,7 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
                 <p className="font-serif">Período: 26/03/2024 - 24/04/2024</p>
             </div>
             {loading && <div role="status" className="animate-pulse p-4" >
-                <div className="bg-gray-200 dark:bg-gray-400 " style={{ width: '100%', height: height }}></div>
+                <div className="bg-gray-200 dark:bg-gray-400 " style={{ width: '100%', height: 400 }}></div>
             </div>}
             <svg ref={svgRef} />
             <div className="border-black flex flex-wrap justify-center pt-2" >

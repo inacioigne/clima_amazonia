@@ -3,7 +3,7 @@ import path from 'path';
 
 import MapAnomalySvg from "@/components/maps/mapAnomalySvg"
 import MapAcumulado from '@/components/maps/acumulado';
-import MapAcumuladoServer from "@/components/maps/mapAcumuladoServer"
+// import MapAcumuladoServer from "@/components/maps/mapAcumuladoServer"
 
 
 async function getCountries() {
@@ -60,8 +60,8 @@ export default async function Home() {
       </div>
       <div className="grid col-span-5 2xl:col-span-2  gap-3">
         <div>
-        {/* <MapAcumulado bacias={bacias} countries={countries} preciptation={acumulado} /> */}
-        <MapAcumuladoServer bacias={bacias} countries={countries} />
+        <MapAcumulado bacias={bacias} countries={countries} />
+        {/* <MapAcumuladoServer bacias={bacias} countries={countries} /> */}
         <div className='bg-blue-500'>Map mediana</div>
 
         </div>
