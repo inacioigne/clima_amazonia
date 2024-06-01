@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import { FeatureCollection, Feature, Geometry, GeometryCollection, Point, Position } from 'geojson';
+import { FeatureCollection, Feature, Geometry, Point } from 'geojson';
 
 interface PropertiesBacias {
     label: string;
@@ -37,7 +37,6 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
     }
 
     useEffect(() => {
-        // setLoading(true)
         if (svgRef.current) {
             const svg = d3.select(svgRef.current).attr('viewBox', [0, 0, width, height])
                 .attr('preserveAspectRatio', 'xMidYMid meet');
@@ -98,115 +97,21 @@ export default function MapAnomalySvg({ bacias, countries, preciptation }: Props
             })
             setLoading(false)
 
-            // const loadData = async () => {
-            //     setLoading(true)
-            //     try {
-            //         const response = await fetch('data/preciptation.geojson');
-            //         if (!response.ok) {
-            //             throw new Error('Network response was not ok');
-            //         }
-            //         const data: FeatureCollection<Geometry, PropertiesPrec> = await response.json();
-
-            //         svg.selectAll("circle")
-            //             .data(data.features)
-            //             .enter().append("circle")
-            //             .attr("cx", d => {
-            //                 const coordinates = (d.geometry as Point).coordinates;
-            //                 const projected = projection(coordinates as [number, number]);
-            //                 return projected ? projected[0] : 0;
-            //             })
-            //             .attr("cy", d => {
-            //                 const coordinates = (d.geometry as Point).coordinates;
-            //                 const projected = projection(coordinates as [number, number]);
-            //                 return projected ? projected[1] : 0;
-            //             })
-            //             .attr("r", 2)
-            //             .style("fill", d => d.properties.color)
-
-            //         svg.selectAll("path.country")
-            //             .data(countries.features).enter().append("path")
-            //             .attr("d", pathGenerator)
-            //             .attr('fill', 'none')
-            //             .attr('stroke', 'black')
-
-            //         svg.selectAll("path.bacia")
-            //             .data(bacias.features).enter().append("path")
-            //             .attr("d", pathGenerator)
-            //             .attr('fill', 'none')
-            //             .attr('stroke', 'black')
-            //             .style("stroke-width", 2)
-
-            //         // const labels = svg.selectAll(".label-group")
-            //         //     .data(bacias.features)
-            //         //     .enter()
-            //         //     .append("g")
-            //         //     .attr("class", "label-group")
-            //         //     .attr("transform", d => `translate(${pathGenerator.centroid(d)})`);
-            //         // // Adicionar os rótulos
-            //         // labels.append("text")
-            //         //     .attr("dy", ".35em")
-            //         //     .text(d => d.properties.label)
-            //         //     .each(function (d) {
-            //         //         const bbox = (this as SVGTextElement).getBBox();
-            //         //         d.bbox = bbox;
-            //         //     });
-            //         // labels.insert("rect", "text")
-            //         //     .attr("x", d => d.bbox.x - 2)
-            //         //     .attr("y", d => d.bbox.y - 2)
-            //         //     .attr("width", d => d.bbox.width + 4)
-            //         //     .attr("height", d => d.bbox.height + 4)
-            //         //     .attr('fill', 'lightgrey')
-
-
-
-            //         bacias.features.forEach(feature => {
-            //             const [x, y] = safeProjection(feature, projection);
-            //             const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
-            //             const text = group.append('text')
-            //                 .text(feature.properties.label)
-            //                 .attr("font-size", "10px")
-            //                 .attr('text-anchor', 'middle')
-            //                 .attr('dy', '.35em');
-            //             const bbox = text.node()?.getBBox();
-            //             if (bbox !== undefined) {
-            //                 if (bbox.x !== 0) {
-            //                     group.insert('rect', 'text')
-            //                         .attr('x', bbox.x - 2) // Pequena margem
-            //                         .attr('y', bbox.y - 2)
-            //                         .attr('rx', 5)
-            //                         .attr('ry', 5)
-            //                         .attr('width', bbox.width + 4) // Ajuste para a margem
-            //                         .attr('height', bbox.height + 4)
-            //                         .attr('fill', 'lightgrey');
-            //                 }
-            //                 text.raise();
-            //             }
-            //         })
-            //     } catch (error) {
-            //         console.error('Error fetching GeoJSON data:', error);
-            //     }
-            //     setLoading(false)
-
-            // };
-            // loadData();
+            
         }
-        
+
     }, [bacias, countries, preciptation])
 
     return (
         <div >
             <div className="px-4 pb-4">
-
                 <h3>Anomalia de chuva categorizada</h3>
                 <p className="font-serif">Período: 26/03/2024 - 24/04/2024</p>
             </div>
             {loading && <div role="status" className="animate-pulse p-4" >
                 <div className="bg-gray-200 dark:bg-gray-400 " style={{ width: '100%', height: height }}></div>
             </div>}
-            <svg ref={svgRef} 
-            // style={loading ? { display: "none", width: '100%', height: 'auto' } : { width: '100%', height: 'auto' }} 
-            />
-
+            <svg ref={svgRef} />
             <div className="border-black flex flex-wrap justify-center pt-2" >
                 <div>
                     <div className="w-8 h-4" style={{ backgroundColor: '#8C1F28' }} />
