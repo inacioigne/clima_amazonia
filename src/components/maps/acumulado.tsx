@@ -15,9 +15,8 @@ interface Props {
     preciptation: FeatureCollection<Geometry, PropertiesPrec>;
     bacias: FeatureCollection<Geometry, PropertiesBacias>;
     countries: FeatureCollection<Geometry>;
-
-
 }
+
 export default function MapAcumulado({ preciptation, countries, bacias }: Props) {
     // console.log(preciptation.features[0])
     const svgRef = useRef<SVGSVGElement | null>(null);

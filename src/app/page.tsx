@@ -3,6 +3,7 @@ import path from 'path';
 
 import MapAnomalySvg from "@/components/maps/mapAnomalySvg"
 import MapAcumulado from '@/components/maps/acumulado';
+import MapAcumuladoServer from "@/components/maps/mapAcumuladoServer"
 
 
 async function getCountries() {
@@ -35,21 +36,21 @@ async function getPreciptation() {
   return preciptation
 }
 
-async function getAcumulado() {
-  const filePath = path.join(process.cwd(), 'public', 'data/acumulado/data.geojson');
-  const jsonData = fs.readFileSync(filePath, 'utf8');
-  const acumulado = JSON.parse(jsonData);
-  if (!acumulado) {
-    throw new Error('Failed to fetch data')
-  }
-  return acumulado
-}
+// async function getAcumulado() {
+//   const filePath = path.join(process.cwd(), 'public', 'data/acumulado/data.geojson');
+//   const jsonData = fs.readFileSync(filePath, 'utf8');
+//   const acumulado = JSON.parse(jsonData);
+//   if (!acumulado) {
+//     throw new Error('Failed to fetch data')
+//   }
+//   return acumulado
+// }
 
 export default async function Home() {
   const countries = await getCountries()
   const bacias = await getBacias()
   const preciptation = await getPreciptation()
-  const acumulado = await getAcumulado()
+  // const acumulado = await getAcumulado()
 
   return (
     <div className="h-full w-full container mx-auto py-4 grid gap-3 grid-cols-5">
@@ -59,7 +60,8 @@ export default async function Home() {
       </div>
       <div className="grid col-span-5 2xl:col-span-2  gap-3">
         <div>
-        <MapAcumulado bacias={bacias} countries={countries} preciptation={acumulado} />
+        {/* <MapAcumulado bacias={bacias} countries={countries} preciptation={acumulado} /> */}
+        <MapAcumuladoServer bacias={bacias} countries={countries} />
         <div className='bg-blue-500'>Map mediana</div>
 
         </div>
