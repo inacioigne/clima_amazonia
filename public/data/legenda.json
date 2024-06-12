@@ -1,0 +1,171 @@
+[
+    [
+        {
+            "id": 1,
+            "nome": "Abacaxis", 
+            "cor": "bg-neutral-50"
+        },
+        {
+            "id": 2,
+            "nome": "Amazonas (BR)",
+            "cor": "bg-blue-500"
+        },
+        {
+            "id": 3,
+            "nome": "Amazonas (PE)",
+            "cor": "bg-blue-500"
+        },
+        {
+            "id": 4,
+            "nome": "Aripuanã",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 5,
+            "nome": "Beni",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 6,
+            "nome": "Branco",
+            "cor": "bg-blue-500"
+        },
+        {
+            "id": 7,
+            "nome": "Coari",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 8,
+            "nome": "Curuá Una",
+            "cor": "bg-neutral-50"
+        }
+    ],
+    [
+        {
+            "id": 9,
+            "nome": "Guaporé",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 10,
+            "nome": "Içá",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 11,
+            "nome": "Iriri",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 12,
+            "nome": "Japurá",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 13,
+            "nome": "Javari",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 14,
+            "nome": "Ji-Paraná",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 15,
+            "nome": "Juruá",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 16,
+            "nome": "Juruena",
+            "cor": "bg-amber-500"
+        }
+    ],
+    [
+        {
+            "id": 17,
+            "nome": "Jutaí",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 18,
+            "nome": "Madeira",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 19,
+            "nome": "Mamoré",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 20,
+            "nome": "Marañon",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 21,
+            "nome": "Marg Esq (AM)",
+            "cor": "bg-neutral-50"
+        },
+        {
+            "id": 22,
+            "nome": "Marg Esq (PA) NE",
+            "cor": "bg-blue-500"
+        },
+        {
+            "id": 23,
+            "nome": "Marg Esq (PA) NW",
+            "cor": "bg-blue-500"
+        },
+        {
+            "id": 24,
+            "nome": "Napo",
+            "cor": "bg-amber-500"
+        }
+    ],
+    [
+        {
+            "id": 25,
+            "nome": "Negro",
+            "cor": "bg-neutral-50"
+        },
+        {
+            "id": 26,
+            "nome": "Purus",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 27,
+            "nome": "Solimões",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 28,
+            "nome": "Tapajós",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 29,
+            "nome": "Tefé",
+            "cor": "bg-neutral-50"
+        },
+        {
+            "id": 30,
+            "nome": "Teles Pires",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 31,
+            "nome": "Ucayali",
+            "cor": "bg-amber-500"
+        },
+        {
+            "id": 32,
+            "nome": "Xingu",
+            "cor": "bg-amber-500"
+        }
+    ]
+    
+]
