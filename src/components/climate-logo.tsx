@@ -1,5 +1,5 @@
 import { GiRiver } from "react-icons/gi";
-// import { lusitana } from '@/app/ui/fonts';
+
 
 export default function ClimateLogo() {
   return (
@@ -8,6 +8,8 @@ export default function ClimateLogo() {
     >
       <GiRiver className="h-12 w-12" />
       <p className="text-[17px]">Clima Amazônia</p>
+      
+
     </div>
   );
 }
