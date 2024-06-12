@@ -71,8 +71,8 @@ export default function BtnBacias() {
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                {bacias.map((bacia) => (
-                    <Link href={`/bacia/${bacia.id}`}>
+                {bacias.map((bacia, index) => (
+                    <Link key={index} href={`/bacia/${bacia.id}`}>
                     <MenuItem onClick={handleClose}>{bacia.nome}</MenuItem>
                     </Link>
                 ))}
